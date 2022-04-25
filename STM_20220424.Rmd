@@ -1,0 +1,53 @@
+---
+title: "COM5508 Project"
+author: "Chan Hiu Sze"
+date: "24/04/2022"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+run library
+```{r}
+library(stm)
+```
+
+read file
+```{r}
+data = read.csv("df1_concat.csv")
+data$band = as.factor(data$band)
+```
+
+Preprocessing
+```{r}
+processed <- textProcessor(data$concat, metadata = data) 
+out <- prepDocuments(processed$documents, processed$vocab, processed$meta)
+docs <- out$documents
+vocab <- out$vocab
+meta <- out$meta
+```
+
+data fit into STM model
+```{r}
+poliblogPrevFit <- stm(documents = out$documents, vocab = out$vocab, K = 10, prevalence = ~band, max.em.its = 75, data = out$meta, seed = 351, init.type = "Spectral")
+```
+Difference of different school band in each topic
+```{r}
+prep <- estimateEffect(1:10 ~ band, poliblogPrevFit, meta = out$meta, uncertainty = "Global")
+summary(prep, topics = 1)
+summary(prep, topics = 2)
+summary(prep, topics = 3)
+summary(prep, topics = 4)
+summary(prep, topics = 5)
+summary(prep, topics = 6)
+summary(prep, topics = 7)
+summary(prep, topics = 8)
+summary(prep, topics = 9)
+summary(prep, topics = 10)
+```
+```{r}
+labelTopics(poliblogPrevFit)
+```
+
